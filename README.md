@@ -1,2 +1,2 @@
-# microservices-
-Microservices lesson
+# Microservices
+Microservices lesson, docker, CQRS
