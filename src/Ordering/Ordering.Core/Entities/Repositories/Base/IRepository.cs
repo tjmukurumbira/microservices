@@ -25,7 +25,7 @@ namespace Ordering.Core.Entities.Repositories.Base
            bool disableTracking = true
            );
 
-        Task<T> GetByidAsync(int id);
+        Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
         Task UpadateAsync(T entity);
 
