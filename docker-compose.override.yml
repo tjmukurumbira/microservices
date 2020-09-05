@@ -13,6 +13,15 @@ services:
         restart: always
         ports:
             - "6379:6379"
+    orderdb:
+        container_name: orderdb
+        image: "mcr.microsoft.com/mssql/server"
+        restart: always
+        environment:
+            SA_PASSWORD: "Password_01"
+            ACCEPT_EULA: "Y"        
+        ports:
+            - "1433:1433"         
     rabbitmq:
         container_name: rabbitmq
         restart: always
@@ -20,6 +29,7 @@ services:
             - "5672:5672"
             - "15672:15672"
     catalog.api:
+        container_name: catalogapi
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
             - "CatalogDatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
@@ -31,9 +41,10 @@ services:
             - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
             - ${HOME}/.aspnet/https:/root/.aspnet/https/
     basket.api:
+        container_name: basketapi
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
-            - "ConnectionStrings:Redis=basketdb:6279"
+            - "ConnectionStrings:Redis=basketdb:6379"
             - "EventBus:HostName=rabbitmq"
         depends_on:
             - basketdb
@@ -43,3 +54,32 @@ services:
         volumes:
             - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
             - ${HOME}/.aspnet/https:/root/.aspnet/https/
+    order.api:
+        container_name: orderapi
+        restart: on-failure
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - "EventBus:HostName=rabbitmq"
+            - "ConnectionStrings:OrderConnection=Server=orderdb;Database=OrderDb; User Id=sa;Password=Password_01;"
+        depends_on:
+            - orderdb
+            - rabbitmq
+        ports:
+            - "8002:80"
+        volumes:
+            - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
+            - ${HOME}/.aspnet/https:/root/.aspnet/https/
+    api.gateway:
+        container_name: gatewayapi
+        restart: on-failure
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        depends_on:
+            - catalog.api
+            - basket.api
+            - order.api
+        ports:
+            - "7000:80"
+        volumes:
+            - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+            - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
