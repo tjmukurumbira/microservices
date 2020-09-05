@@ -7,7 +7,8 @@ services:
         image: redis
     rabbitmq:
         image: rabbitmq:3-management-alpine
-
+    orderdb:
+        image: mcr.microsoft.com/mssql/server
     catalog.api:
         image: ${DOCKER_REGISTRY-}catalogapi
         build:
@@ -18,4 +19,14 @@ services:
         build:
             context: .
             dockerfile: src/Basket/Basket.API/Dockerfile
+    order.api:
+        image: ${DOCKER_REGISTRY-}orderapi
+        build:
+            context: .
+            dockerfile: src/Ordering/Ordering.API/Dockerfile
+    api.gateway:
+        image: ${DOCKER_REGISTRY-}apigateway
+        build:
+            context: .
+            dockerfile: src/Gateway/API.Gateway/Dockerfile
 
