@@ -29,4 +29,10 @@ services:
         build:
             context: .
             dockerfile: src/Gateway/API.Gateway/Dockerfile
+  
+    eshop.web:
+        image: ${DOCKER_REGISTRY-}eshopweb
+        build:
+            context: .
+            dockerfile: src/WebApp/eShop.Web/Dockerfile
 

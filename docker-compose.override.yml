@@ -82,4 +82,20 @@ services:
             - "7000:80"
         volumes:
             - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+            - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro    
+    eshop.web:
+        container_name: eshopweb
+        restart: on-failure
+        depends_on:
+            - catalog.api
+            - basket.api
+            - order.api
+            - api.gateway
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - "ApiSettings:BaseAddress=gatewayapi"
+        ports:
+            - "8003:80"           
+        volumes:
+            - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
             - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
